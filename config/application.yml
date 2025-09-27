@@ -1,0 +1,68 @@
+# Application Configuration
+app:
+  name: "RideSecure"
+  version: "1.0.0"
+  debug: false
+
+# Database Configuration
+database:
+  path: "./database/ridesecure.db"
+  connection_pool_size: 10
+  
+# Model Configuration
+models:
+  helmet_detection:
+    onnx_path: "./models/onnx/helmet_yolo_v8.onnx"
+    confidence_threshold: 0.7
+    nms_threshold: 0.45
+    input_size: [640, 640]
+    
+  license_plate:
+    onnx_path: "./models/onnx/plate_detection_yolo_v8.onnx"
+    confidence_threshold: 0.6
+    nms_threshold: 0.4
+    input_size: [640, 640]
+
+# OCR Configuration
+ocr:
+  tesseract_data_path: "./config/tessdata"
+  language: "eng"
+  psm_mode: 8  # Single word mode
+  oem_mode: 3  # Default OCR Engine Mode
+
+# Video Processing
+video:
+  max_fps: 30
+  buffer_size: 10
+  supported_formats: [".mp4", ".avi", ".mov", ".mkv"]
+  output_format: "mp4"
+
+# Python Service Configuration (if using API mode)
+python_service:
+  host: "localhost"
+  port: 8000
+  timeout_seconds: 30
+  max_retries: 3
+
+# Output Configuration  
+output:
+  snapshots_dir: "./output/snapshots"
+  reports_dir: "./output/reports"
+  max_snapshot_age_days: 30
+  image_format: "jpg"
+  image_quality: 85
+
+# Logging Configuration
+logging:
+  level: "INFO"
+  file: "./output/logs/ridesecure.log"
+  max_file_size: "10MB"
+  backup_count: 5
+  console_output: true
+
+# Detection Thresholds
+detection:
+  helmet_violation_threshold: 0.8
+  min_detection_duration_frames: 5  # Minimum frames to confirm violation
+  license_plate_min_area: 1000
+  license_plate_aspect_ratio_range: [2.0, 6.0]
