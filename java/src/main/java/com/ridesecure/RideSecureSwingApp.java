@@ -1,5 +1,8 @@
 package com.ridesecure;
 
+import com.ridesecure.model.Violation;
+import com.ridesecure.service.DatabaseService;
+
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
@@ -47,12 +50,27 @@ public class RideSecureSwingApp extends JFrame {
     private File currentVideoFile;
     private boolean isDetectionRunning = false;
     private javax.swing.Timer detectionTimer;
+    private DatabaseService databaseService;
     
     public RideSecureSwingApp() {
         super(APP_TITLE);
+        
+        // Initialize database service
+        try {
+            databaseService = DatabaseService.getInstance();
+            System.out.println("Database service initialized successfully");
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, 
+                "Failed to initialize database: " + e.getMessage(), 
+                "Database Error", 
+                JOptionPane.ERROR_MESSAGE);
+            System.exit(1);
+        }
+        
         initializeComponents();
         setupLayout();
         setupEventHandlers();
+        loadExistingViolations();
         
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(1200, 800);
@@ -393,24 +411,82 @@ public class RideSecureSwingApp extends JFrame {
     }
     
     private void addMockViolation(int id) {
-        String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
+        // Create a real violation object
+        Violation violation = new Violation();
+        violation.setTimestamp(LocalDateTime.now());
+        violation.setVideoSource(currentVideoFile != null ? currentVideoFile.getName() : "sample_video.mp4");
+        violation.setFrameNumber(id * 125 + (int)(Math.random() * 100)); // Mock frame number
+        
+        double detectionConfidence = 70 + Math.random() * 30;
+        violation.setDetectionConfidence(detectionConfidence / 100.0); // Store as decimal
+        
         String licensePlate = "MH" + String.format("%02d", (int)(Math.random() * 99)) + 
                              "AB" + String.format("%04d", (int)(Math.random() * 9999));
-        String confidence = String.format("%.1f%%", 70 + Math.random() * 30);
-        String status = "DETECTED";
+        violation.setLicensePlate(licensePlate);
+        violation.setPlateConfidence(0.8 + Math.random() * 0.2); // Mock plate confidence
         
-        Object[] rowData = {id, timestamp, licensePlate, confidence, status};
-        tableModel.addRow(rowData);
+        violation.setViolationType("NO_HELMET");
+        violation.setStatus("DETECTED");
+        violation.setLocationInfo("Traffic Junction " + (int)(Math.random() * 10 + 1));
         
-        // Scroll to latest row
-        int lastRow = violationsTable.getRowCount() - 1;
-        violationsTable.scrollRectToVisible(violationsTable.getCellRect(lastRow, 0, true));
+        // Save to database
+        if (databaseService.saveViolation(violation)) {
+            // Add to table display
+            String timestamp = violation.getTimestamp().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
+            String confidence = String.format("%.1f%%", detectionConfidence);
+            
+            Object[] rowData = {violation.getId(), timestamp, licensePlate, confidence, violation.getStatus()};
+            tableModel.addRow(rowData);
+            
+            // Scroll to latest row
+            int lastRow = violationsTable.getRowCount() - 1;
+            violationsTable.scrollRectToVisible(violationsTable.getCellRect(lastRow, 0, true));
+            
+            System.out.println("Violation saved: ID=" + violation.getId() + ", Plate=" + licensePlate);
+        } else {
+            System.err.println("Failed to save violation to database");
+        }
     }
     
     private void updateStatistics() {
-        totalViolationsLabel.setText(String.valueOf(tableModel.getRowCount()));
-        accuracyLabel.setText("85.7%"); // Mock value
+        if (databaseService != null) {
+            DatabaseService.ViolationStats stats = databaseService.getViolationStats();
+            totalViolationsLabel.setText(String.valueOf(stats.getTotalViolations()));
+            accuracyLabel.setText(String.format("%.1f%%", stats.getAverageConfidence() * 100));
+        } else {
+            totalViolationsLabel.setText(String.valueOf(tableModel.getRowCount()));
+            accuracyLabel.setText("85.7%"); // Mock value
+        }
         speedLabel.setText("12.5 FPS"); // Mock value
+    }
+    
+    private void loadExistingViolations() {
+        if (databaseService == null) return;
+        
+        try {
+            List<Violation> violations = databaseService.getAllViolations();
+            tableModel.setRowCount(0); // Clear existing data
+            
+            for (Violation violation : violations) {
+                String timestamp = violation.getTimestamp().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
+                String confidence = String.format("%.1f%%", violation.getDetectionConfidence() * 100);
+                
+                Object[] rowData = {
+                    violation.getId(), 
+                    timestamp, 
+                    violation.getLicensePlate(), 
+                    confidence, 
+                    violation.getStatus()
+                };
+                tableModel.addRow(rowData);
+            }
+            
+            updateStatistics();
+            System.out.println("Loaded " + violations.size() + " existing violations from database");
+            
+        } catch (Exception e) {
+            System.err.println("Failed to load existing violations: " + e.getMessage());
+        }
     }
     
     private void updateTimeLabel() {
@@ -430,14 +506,51 @@ public class RideSecureSwingApp extends JFrame {
     }
     
     private void clearResults() {
-        int option = JOptionPane.showConfirmDialog(this, 
-            "Are you sure you want to clear all results?", 
-            "Clear Results", JOptionPane.YES_NO_OPTION);
+        String[] options = {"Clear Table Only", "Clear Table & Database", "Cancel"};
+        int option = JOptionPane.showOptionDialog(this,
+            "Choose what to clear:",
+            "Clear Results",
+            JOptionPane.YES_NO_CANCEL_OPTION,
+            JOptionPane.QUESTION_MESSAGE,
+            null,
+            options,
+            options[0]);
             
-        if (option == JOptionPane.YES_OPTION) {
+        if (option == 0) { // Clear table only
             tableModel.setRowCount(0);
-            updateStatistics();
-            updateStatus("Results cleared");
+            updateStatus("Table cleared");
+        } else if (option == 1) { // Clear table and database
+            int confirm = JOptionPane.showConfirmDialog(this,
+                "This will permanently delete ALL violations from the database!\nAre you sure?",
+                "Confirm Database Clear",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.WARNING_MESSAGE);
+                
+            if (confirm == JOptionPane.YES_OPTION) {
+                // Clear database (we'll implement this method)
+                clearDatabase();
+                tableModel.setRowCount(0);
+                updateStatistics();
+                updateStatus("Database and table cleared");
+            }
+        }
+    }
+    
+    private void clearDatabase() {
+        // For now, we'll delete all violations one by one
+        // In a real implementation, you might want a more efficient bulk delete
+        try {
+            List<Violation> violations = databaseService.getAllViolations();
+            for (Violation violation : violations) {
+                databaseService.deleteViolation(violation.getId());
+            }
+            System.out.println("Cleared " + violations.size() + " violations from database");
+        } catch (Exception e) {
+            System.err.println("Failed to clear database: " + e.getMessage());
+            JOptionPane.showMessageDialog(this, 
+                "Failed to clear database: " + e.getMessage(), 
+                "Database Error", 
+                JOptionPane.ERROR_MESSAGE);
         }
     }
     
