@@ -24,10 +24,10 @@ REM Clean previous build
 echo Cleaning previous build...
 if exist "build\*.class" del /q "build\*.class"
 
-REM Compile Swing application
-echo Compiling RideSecure Swing Application...
+REM Compile Swing application with Supabase PostgreSQL support
+echo Compiling RideSecure Swing Application with Supabase Database...
 cd src\main\java
-javac -d ..\..\..\build com\ridesecure\RideSecureSwingApp.java
+javac -cp "..\..\..\lib\postgresql-42.7.1.jar" -d ..\..\..\build com\ridesecure\config\*.java com\ridesecure\model\*.java com\ridesecure\service\*.java com\ridesecure\RideSecureSwingApp.java
 
 if %errorlevel% equ 0 (
     echo.
