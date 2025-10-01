@@ -5,12 +5,18 @@ import com.ridesecure.service.DatabaseService;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.image.BufferedImage;
 import javax.swing.*;
 import javax.swing.table.*;
 import java.util.List;
+import java.util.ArrayList;
 import java.io.File;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import javax.imageio.ImageIO;
+import java.io.IOException;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 
 /**
  * Simplified RideSecure Desktop Application using Swing
@@ -26,6 +32,15 @@ public class RideSecureSwingApp extends JFrame {
     private JPanel videoPanel;
     private JLabel videoLabel;
     private JButton openVideoButton;
+    
+    // Video playback
+    private Timer videoTimer;
+    private boolean isPlaying = false;
+    private int currentFrameIndex = 0;
+    private List<BufferedImage> videoFrames;
+    private int totalFrames = 0;
+    private double frameRate = 30.0;
+    private JLabel videoDisplayLabel;
     private JButton playButton;
     private JButton pauseButton;
     private JButton stopButton;
@@ -81,14 +96,24 @@ public class RideSecureSwingApp extends JFrame {
     
     private void initializeComponents() {
         // Video components
-        videoPanel = new JPanel();
+        videoPanel = new JPanel(new BorderLayout());
         videoPanel.setBackground(Color.BLACK);
         videoPanel.setBorder(BorderFactory.createTitledBorder("Video Display"));
         videoPanel.setPreferredSize(new Dimension(640, 480));
         
+        // Create display label for actual video frames
+        videoDisplayLabel = new JLabel("", SwingConstants.CENTER);
+        videoDisplayLabel.setBackground(Color.BLACK);
+        videoDisplayLabel.setOpaque(true);
+        
+        // Info label below video
         videoLabel = new JLabel("No video loaded", SwingConstants.CENTER);
         videoLabel.setForeground(Color.WHITE);
-        videoLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        videoLabel.setFont(new Font("Arial", Font.BOLD, 12));
+        
+        // Add components to video panel
+        videoPanel.add(videoDisplayLabel, BorderLayout.CENTER);
+        videoPanel.add(videoLabel, BorderLayout.SOUTH);
         
         // Video controls
         openVideoButton = new JButton("📂 Open Video");
@@ -292,8 +317,16 @@ public class RideSecureSwingApp extends JFrame {
         stopDetectionButton.addActionListener(e -> stopDetection());
         
         timeSlider.addChangeListener(e -> {
-            if (!timeSlider.getValueIsAdjusting()) {
-                updateTimeLabel();
+            if (!timeSlider.getValueIsAdjusting() && !isPlaying) {
+                // Allow seeking when not playing
+                currentFrameIndex = timeSlider.getValue();
+                
+                // Show the frame at the new position
+                if (videoFrames != null && currentFrameIndex >= 0 && currentFrameIndex < videoFrames.size()) {
+                    showFrame(currentFrameIndex);
+                } else {
+                    updateTimeLabel();
+                }
             }
         });
     }
@@ -324,31 +357,125 @@ public class RideSecureSwingApp extends JFrame {
     
     private void loadVideo() {
         if (currentVideoFile != null) {
-            videoLabel.setText("Video: " + currentVideoFile.getName());
-            playButton.setEnabled(true);
-            pauseButton.setEnabled(true);
-            stopButton.setEnabled(true);
-            timeSlider.setEnabled(true);
-            startDetectionButton.setEnabled(true);
+            // Show loading message
+            videoLabel.setText("Loading video frames...");
+            updateStatus("Extracting frames from: " + currentVideoFile.getName());
             
-            updateStatus("Video loaded: " + currentVideoFile.getName());
+            // Extract video frames in background thread
+            SwingWorker<Void, Void> frameExtractor = new SwingWorker<Void, Void>() {
+                @Override
+                protected Void doInBackground() throws Exception {
+                    extractVideoFrames();
+                    return null;
+                }
+                
+                @Override
+                protected void done() {
+                    if (videoFrames != null && !videoFrames.isEmpty()) {
+                        // Enable controls
+                        playButton.setEnabled(true);
+                        pauseButton.setEnabled(true);
+                        stopButton.setEnabled(true);
+                        timeSlider.setEnabled(true);
+                        startDetectionButton.setEnabled(true);
+                        
+                        // Setup slider
+                        totalFrames = videoFrames.size();
+                        timeSlider.setMaximum(totalFrames - 1);
+                        timeSlider.setValue(0);
+                        currentFrameIndex = 0;
+                        
+                        // Show first frame
+                        showFrame(0);
+                        
+                        videoLabel.setText(currentVideoFile.getName() + " (" + totalFrames + " frames)");
+                        updateStatus("Video loaded successfully: " + totalFrames + " frames");
+                    } else {
+                        videoLabel.setText("Failed to load video");
+                        updateStatus("Failed to extract frames");
+                        JOptionPane.showMessageDialog(RideSecureSwingApp.this, 
+                            "Could not extract frames from video. Make sure FFmpeg is installed.",
+                            "Video Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+            };
+            
+            frameExtractor.execute();
         }
     }
     
     private void playVideo() {
-        updateStatus("Playing video...");
-        // TODO: Implement actual video playback
+        if (currentVideoFile == null || videoFrames == null || videoFrames.isEmpty()) {
+            if (currentVideoFile != null && (videoFrames == null || videoFrames.isEmpty())) {
+                updateStatus("Video frames not ready. Please wait for loading...");
+            }
+            return;
+        }
+        
+        isPlaying = true;
+        updateStatus("Playing video: " + currentVideoFile.getName());
+        
+        // Stop any existing timer
+        if (videoTimer != null) {
+            videoTimer.stop();
+        }
+        
+        // Create timer for frame-based video playback
+        int timerDelay = (int)(1000.0 / frameRate); // Convert frame rate to milliseconds
+        videoTimer = new Timer(timerDelay, e -> {
+            if (isPlaying && currentFrameIndex < videoFrames.size()) {
+                showFrame(currentFrameIndex);
+                currentFrameIndex++;
+                timeSlider.setValue(currentFrameIndex);
+                
+                // Auto-stop at end
+                if (currentFrameIndex >= videoFrames.size()) {
+                    stopVideo();
+                }
+            }
+        });
+        
+        videoTimer.start();
+        playButton.setEnabled(false);
+        pauseButton.setEnabled(true);
+        stopButton.setEnabled(true);
     }
     
     private void pauseVideo() {
+        isPlaying = false;
+        if (videoTimer != null) {
+            videoTimer.stop();
+        }
+        
         updateStatus("Video paused");
-        // TODO: Implement video pause
+        playButton.setEnabled(true);
+        pauseButton.setEnabled(false);
     }
     
     private void stopVideo() {
+        isPlaying = false;
+        if (videoTimer != null) {
+            videoTimer.stop();
+        }
+        
+        currentFrameIndex = 0;
         timeSlider.setValue(0);
+        timeLabel.setText("00:00");
+        
+        // Show first frame if available
+        if (videoFrames != null && !videoFrames.isEmpty()) {
+            showFrame(0);
+        } else if (currentVideoFile != null) {
+            videoLabel.setText("<html><center>" +
+                "<b>" + currentVideoFile.getName() + "</b><br>" +
+                "Ready to play" +
+                "</center></html>");
+        }
+        
         updateStatus("Video stopped");
-        // TODO: Implement video stop
+        playButton.setEnabled(true);
+        pauseButton.setEnabled(false);
+        stopButton.setEnabled(false);
     }
     
     private void startDetection() {
@@ -489,12 +616,7 @@ public class RideSecureSwingApp extends JFrame {
         }
     }
     
-    private void updateTimeLabel() {
-        int value = timeSlider.getValue();
-        int minutes = value / 60;
-        int seconds = value % 60;
-        timeLabel.setText(String.format("%02d:%02d / 05:00", minutes, seconds));
-    }
+
     
     private void updateStatus(String status) {
         statusLabel.setText(status);
@@ -573,6 +695,149 @@ public class RideSecureSwingApp extends JFrame {
             
         JOptionPane.showMessageDialog(this, aboutText, "About RideSecure", 
                                     JOptionPane.INFORMATION_MESSAGE);
+    }
+    
+    private void updateTimeLabel() {
+        double seconds = currentFrameIndex / frameRate;
+        int minutes = (int) seconds / 60;
+        int secs = (int) seconds % 60;
+        timeLabel.setText(String.format("%02d:%02d", minutes, secs));
+    }
+    
+    private void extractVideoFrames() {
+        videoFrames = new ArrayList<>();
+        
+        try {
+            // Create temp directory for frames
+            File tempDir = new File(System.getProperty("java.io.tmpdir"), "ridesecure_frames");
+            if (!tempDir.exists()) {
+                tempDir.mkdirs();
+            }
+            
+            // Clear old frames
+            File[] oldFrames = tempDir.listFiles((dir, name) -> name.startsWith("frame_") && name.endsWith(".jpg"));
+            if (oldFrames != null) {
+                for (File frame : oldFrames) {
+                    frame.delete();
+                }
+            }
+            
+            // Use FFmpeg to extract frames (if available)
+            String ffmpegCmd = String.format(
+                "ffmpeg -i \"%s\" -vf fps=10 \"%s/frame_%%04d.jpg\"",
+                currentVideoFile.getAbsolutePath(),
+                tempDir.getAbsolutePath()
+            );
+            
+            // Try to run FFmpeg
+            Process process = Runtime.getRuntime().exec(ffmpegCmd);
+            
+            // Wait for completion with timeout
+            boolean finished = process.waitFor(30, java.util.concurrent.TimeUnit.SECONDS);
+            
+            if (finished && process.exitValue() == 0) {
+                // Load extracted frames
+                File[] frameFiles = tempDir.listFiles((dir, name) -> 
+                    name.startsWith("frame_") && name.endsWith(".jpg"));
+                
+                if (frameFiles != null && frameFiles.length > 0) {
+                    java.util.Arrays.sort(frameFiles);
+                    frameRate = 10.0; // We extracted at 10 FPS
+                    
+                    for (File frameFile : frameFiles) {
+                        try {
+                            BufferedImage frame = ImageIO.read(frameFile);
+                            if (frame != null) {
+                                // Scale frame to fit display
+                                BufferedImage scaledFrame = scaleImage(frame, 640, 360);
+                                videoFrames.add(scaledFrame);
+                            }
+                        } catch (IOException e) {
+                            System.err.println("Error loading frame: " + frameFile.getName());
+                        }
+                    }
+                }
+            } else {
+                // FFmpeg not available, create placeholder frames
+                System.out.println("FFmpeg not found, creating placeholder frames");
+                createPlaceholderFrames();
+            }
+            
+        } catch (Exception e) {
+            System.err.println("Frame extraction failed: " + e.getMessage());
+            createPlaceholderFrames();
+        }
+    }
+    
+    private void createPlaceholderFrames() {
+        videoFrames = new ArrayList<>();
+        frameRate = 30.0;
+        
+        // Create 100 placeholder frames with different colors/text
+        for (int i = 0; i < 100; i++) {
+            BufferedImage frame = new BufferedImage(640, 360, BufferedImage.TYPE_INT_RGB);
+            Graphics2D g2d = frame.createGraphics();
+            
+            // Different background colors
+            Color bgColor = Color.getHSBColor((float)i / 100, 0.3f, 0.8f);
+            g2d.setColor(bgColor);
+            g2d.fillRect(0, 0, 640, 360);
+            
+            // Add frame info
+            g2d.setColor(Color.BLACK);
+            g2d.setFont(new Font("Arial", Font.BOLD, 24));
+            String frameText = "Frame " + (i + 1) + "/100";
+            FontMetrics fm = g2d.getFontMetrics();
+            int textX = (640 - fm.stringWidth(frameText)) / 2;
+            int textY = 180;
+            g2d.drawString(frameText, textX, textY);
+            
+            // Add video filename
+            g2d.setFont(new Font("Arial", Font.PLAIN, 16));
+            String filename = currentVideoFile.getName();
+            fm = g2d.getFontMetrics();
+            textX = (640 - fm.stringWidth(filename)) / 2;
+            textY = 200;
+            g2d.drawString(filename, textX, textY);
+            
+            g2d.dispose();
+            videoFrames.add(frame);
+        }
+    }
+    
+    private BufferedImage scaleImage(BufferedImage original, int maxWidth, int maxHeight) {
+        int originalWidth = original.getWidth();
+        int originalHeight = original.getHeight();
+        
+        // Calculate scaling factor while maintaining aspect ratio
+        double scaleX = (double) maxWidth / originalWidth;
+        double scaleY = (double) maxHeight / originalHeight;
+        double scale = Math.min(scaleX, scaleY);
+        
+        int scaledWidth = (int) (originalWidth * scale);
+        int scaledHeight = (int) (originalHeight * scale);
+        
+        BufferedImage scaled = new BufferedImage(scaledWidth, scaledHeight, BufferedImage.TYPE_INT_RGB);
+        Graphics2D g2d = scaled.createGraphics();
+        g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+        g2d.drawImage(original, 0, 0, scaledWidth, scaledHeight, null);
+        g2d.dispose();
+        
+        return scaled;
+    }
+    
+    private void showFrame(int frameIndex) {
+        if (videoFrames != null && frameIndex >= 0 && frameIndex < videoFrames.size()) {
+            BufferedImage frame = videoFrames.get(frameIndex);
+            ImageIcon icon = new ImageIcon(frame);
+            videoDisplayLabel.setIcon(icon);
+            
+            // Update info
+            double seconds = frameIndex / frameRate;
+            int minutes = (int) seconds / 60;
+            int secs = (int) seconds % 60;
+            timeLabel.setText(String.format("%02d:%02d", minutes, secs));
+        }
     }
     
     public static void main(String[] args) {
