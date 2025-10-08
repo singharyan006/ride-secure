@@ -89,18 +89,12 @@ buildNumber.properties
 *.sqlite
 *.sqlite3
 
-# Models (large files - use Git LFS)
-*.onnx
-*.pt
-*.pth
-*.h5
-*.pb
-
 # Data files
-data/videos/*.mp4
+python/data/videos/*.mp4
 data/videos/*.avi
 data/videos/*.mov
 data/videos/*.mkv
+outputs/
 data/training/*/images/
 data/training/*/labels/
 
