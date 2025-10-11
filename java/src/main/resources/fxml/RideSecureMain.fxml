@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.image.ImageView?>
+
+<BorderPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ridesecure.RideSecureFXController">
+   
+   <!-- Menu Bar -->
+   <top>
+      <MenuBar styleClass="menu-bar">
+         <Menu text="File">
+            <MenuItem text="Open Video..." onAction="#openVideoFile" />
+            <SeparatorMenuItem />
+            <MenuItem text="Exit" onAction="#exitApplication" />
+         </Menu>
+         <Menu text="Help">
+            <MenuItem text="About" onAction="#showAbout" />
+         </Menu>
+      </MenuBar>
+   </top>
+   
+   <!-- Main Content -->
+   <center>
+      <SplitPane dividerPositions="0.55" styleClass="main-split">
+         
+         <!-- Left Panel - Video and Controls -->
+         <VBox spacing="10" styleClass="left-panel">
+            <padding>
+               <Insets bottom="10" left="10" right="5" top="10" />
+            </padding>
+            
+            <!-- Video Display Area -->
+            <VBox VBox.vgrow="ALWAYS" styleClass="video-container">
+               <Label text="Video Display" styleClass="section-title" />
+               <StackPane fx:id="videoStackPane" styleClass="video-display" VBox.vgrow="ALWAYS">
+                  <ImageView fx:id="videoImageView" fitHeight="400" fitWidth="640" preserveRatio="true" />
+                  <Label fx:id="videoStatusLabel" text="No video loaded" styleClass="video-status" />
+               </StackPane>
+               
+               <!-- Video Controls -->
+               <HBox alignment="CENTER" spacing="10" styleClass="video-controls">
+                  <Button fx:id="openVideoButton" text="📂 Open Video" onAction="#openVideoFile" styleClass="control-button" />
+                  <Separator orientation="VERTICAL" />
+                  <Button fx:id="playButton" text="▶ Play" onAction="#playVideo" styleClass="control-button" disable="true" />
+                  <Button fx:id="pauseButton" text="⏸ Pause" onAction="#pauseVideo" styleClass="control-button" disable="true" />
+                  <Button fx:id="stopButton" text="⏹ Stop" onAction="#stopVideo" styleClass="control-button" disable="true" />
+               </HBox>
+               
+               <!-- Time Controls -->
+               <HBox alignment="CENTER" spacing="10" styleClass="time-controls">
+                  <Slider fx:id="timeSlider" max="100" min="0" value="0" HBox.hgrow="ALWAYS" disable="true" />
+                  <Label fx:id="timeLabel" text="00:00 / 00:00" styleClass="time-label" />
+               </HBox>
+            </VBox>
+            
+            <!-- Detection Controls -->
+            <VBox spacing="10" styleClass="detection-container">
+               <Label text="Detection Controls" styleClass="section-title" />
+               <HBox alignment="CENTER" spacing="10">
+                  <Button fx:id="startDetectionButton" text="🔍 Start Detection" onAction="#startDetection" styleClass="start-button" disable="true" />
+                  <Button fx:id="stopDetectionButton" text="⏹ Stop Detection" onAction="#stopDetection" styleClass="stop-button" disable="true" />
+                  <CheckBox fx:id="realTimeCheckbox" text="Real-time Detection" />
+               </HBox>
+               <ProgressBar fx:id="progressBar" maxWidth="Infinity" progress="0" />
+               <Label fx:id="statusLabel" text="Ready" styleClass="status-label" />
+            </VBox>
+         </VBox>
+         
+         <!-- Right Panel - Results and Statistics -->
+         <VBox spacing="10" styleClass="right-panel">
+            <padding>
+               <Insets bottom="10" left="5" right="10" top="10" />
+            </padding>
+            
+            <!-- Statistics Panel -->
+            <VBox spacing="5" styleClass="stats-container">
+               <Label text="Detection Statistics" styleClass="section-title" />
+               <GridPane hgap="10" vgap="5">
+                  <Label text="Total Violations:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                  <Label fx:id="totalViolationsLabel" text="0" GridPane.columnIndex="1" GridPane.rowIndex="0" styleClass="stat-value" />
+                  
+                  <Label text="Detection Accuracy:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                  <Label fx:id="accuracyLabel" text="--" GridPane.columnIndex="1" GridPane.rowIndex="1" styleClass="stat-value" />
+                  
+                  <Label text="Processing Speed:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                  <Label fx:id="speedLabel" text="--" GridPane.columnIndex="1" GridPane.rowIndex="2" styleClass="stat-value" />
+               </GridPane>
+            </VBox>
+            
+            <!-- Violations Table -->
+            <VBox VBox.vgrow="ALWAYS" styleClass="table-container">
+               <Label text="Detected Violations" styleClass="section-title" />
+               <TableView fx:id="violationsTable" VBox.vgrow="ALWAYS">
+                  <columns>
+                     <TableColumn fx:id="idColumn" text="ID" minWidth="50" />
+                     <TableColumn fx:id="timeColumn" text="Time" minWidth="80" />
+                     <TableColumn fx:id="plateColumn" text="License Plate" minWidth="120" />
+                     <TableColumn fx:id="confidenceColumn" text="Confidence" minWidth="100" />
+                     <TableColumn fx:id="statusColumn" text="Status" minWidth="80" />
+                  </columns>
+               </TableView>
+            </VBox>
+            
+            <!-- Action Buttons -->
+            <HBox alignment="CENTER" spacing="10" styleClass="action-buttons">
+               <Button fx:id="exportButton" text="📊 Export Report" onAction="#exportReport" styleClass="action-button" />
+               <Button fx:id="clearButton" text="🗑️ Clear Results" onAction="#clearResults" styleClass="action-button" />
+               <Button fx:id="settingsButton" text="⚙️ Settings" onAction="#showSettings" styleClass="action-button" />
+            </HBox>
+         </VBox>
+      </SplitPane>
+   </center>
+   
+   <!-- Status Bar -->
+   <bottom>
+      <HBox styleClass="status-bar">
+         <Label fx:id="statusBarLeft" text=" Ready" />
+         <Region HBox.hgrow="ALWAYS" />
+         <Label text="RideSecure v1.0.0 (JavaFX) " />
+      </HBox>
+   </bottom>
+</BorderPane>

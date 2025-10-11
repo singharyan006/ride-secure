@@ -1,0 +1,389 @@
+/* RideSecure JavaFX Application Styles */
+
+/* Root and base styling */
+.root {
+    -fx-font-family: "Segoe UI", "Helvetica", "Arial", sans-serif;
+    -fx-font-size: 14px;
+    -fx-background-color: #f5f5f5;
+}
+
+/* Menu Bar */
+.menu-bar {
+    -fx-background-color: linear-gradient(to bottom, #ffffff, #e8e8e8);
+    -fx-border-color: #d0d0d0;
+    -fx-border-width: 0 0 1 0;
+}
+
+.menu-bar .menu .label {
+    -fx-text-fill: #333333;
+}
+
+.menu-bar .menu:hover {
+    -fx-background-color: #e0e0e0;
+}
+
+/* Main Split Pane */
+.main-split {
+    -fx-background-color: #f5f5f5;
+}
+
+.main-split .split-pane-divider {
+    -fx-background-color: #d0d0d0;
+    -fx-padding: 0 2 0 2;
+}
+
+/* Left Panel */
+.left-panel {
+    -fx-background-color: #ffffff;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 2, 2);
+}
+
+/* Right Panel */
+.right-panel {
+    -fx-background-color: #ffffff;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, -2, 2);
+}
+
+/* Section Titles */
+.section-title {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2c3e50;
+    -fx-padding: 0 0 10 0;
+}
+
+/* Video Container */
+.video-container {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #bdc3c7;
+    -fx-border-width: 1;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-padding: 15;
+    -fx-spacing: 10;
+}
+
+.video-display {
+    -fx-background-color: #000000;
+    -fx-border-color: #34495e;
+    -fx-border-width: 2;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+    -fx-min-height: 300;
+    -fx-pref-height: 400;
+}
+
+.video-status {
+    -fx-font-size: 16px;
+    -fx-text-fill: #ffffff;
+    -fx-font-weight: bold;
+}
+
+/* Video Controls */
+.video-controls {
+    -fx-background-color: #ecf0f1;
+    -fx-padding: 10;
+    -fx-spacing: 15;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+}
+
+.time-controls {
+    -fx-padding: 5 0 0 0;
+    -fx-spacing: 10;
+}
+
+.time-label {
+    -fx-font-family: "Consolas", "Monaco", monospace;
+    -fx-font-size: 12px;
+    -fx-text-fill: #34495e;
+    -fx-min-width: 80;
+}
+
+/* Buttons */
+.control-button {
+    -fx-background-color: linear-gradient(to bottom, #3498db, #2980b9);
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-padding: 8 16 8 16;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 2, 0, 0, 1);
+}
+
+.control-button:hover {
+    -fx-background-color: linear-gradient(to bottom, #5dade2, #3498db);
+}
+
+.control-button:pressed {
+    -fx-background-color: linear-gradient(to bottom, #2980b9, #1f618d);
+    -fx-translate-y: 1;
+}
+
+.control-button:disabled {
+    -fx-background-color: #bdc3c7;
+    -fx-text-fill: #7f8c8d;
+    -fx-effect: none;
+}
+
+.start-button {
+    -fx-background-color: linear-gradient(to bottom, #27ae60, #229954);
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-padding: 10 20 10 20;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 2, 0, 0, 1);
+}
+
+.start-button:hover {
+    -fx-background-color: linear-gradient(to bottom, #58d68d, #27ae60);
+}
+
+.start-button:pressed {
+    -fx-background-color: linear-gradient(to bottom, #229954, #1e8449);
+    -fx-translate-y: 1;
+}
+
+.stop-button {
+    -fx-background-color: linear-gradient(to bottom, #e74c3c, #c0392b);
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-padding: 10 20 10 20;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 2, 0, 0, 1);
+}
+
+.stop-button:hover {
+    -fx-background-color: linear-gradient(to bottom, #ec7063, #e74c3c);
+}
+
+.stop-button:pressed {
+    -fx-background-color: linear-gradient(to bottom, #c0392b, #a93226);
+    -fx-translate-y: 1;
+}
+
+.action-button {
+    -fx-background-color: linear-gradient(to bottom, #f39c12, #e67e22);
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-padding: 8 16 8 16;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 2, 0, 0, 1);
+}
+
+.action-button:hover {
+    -fx-background-color: linear-gradient(to bottom, #f7dc6f, #f39c12);
+}
+
+.action-button:pressed {
+    -fx-background-color: linear-gradient(to bottom, #e67e22, #d35400);
+    -fx-translate-y: 1;
+}
+
+/* Detection Container */
+.detection-container {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #bdc3c7;
+    -fx-border-width: 1;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-padding: 15;
+    -fx-spacing: 10;
+}
+
+/* Statistics Container */
+.stats-container {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #bdc3c7;
+    -fx-border-width: 1;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-padding: 15;
+    -fx-spacing: 10;
+}
+
+.stat-value {
+    -fx-font-weight: bold;
+    -fx-font-size: 16px;
+    -fx-text-fill: #2980b9;
+}
+
+/* Table Container */
+.table-container {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #bdc3c7;
+    -fx-border-width: 1;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-padding: 15;
+    -fx-spacing: 10;
+}
+
+/* Table View */
+.table-view {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #d5dbdb;
+    -fx-border-width: 1;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+}
+
+.table-view .column-header-background {
+    -fx-background-color: linear-gradient(to bottom, #f8f9fa, #e9ecef);
+    -fx-border-color: #d5dbdb;
+    -fx-border-width: 0 0 1 0;
+}
+
+.table-view .column-header {
+    -fx-font-weight: bold;
+    -fx-text-fill: #2c3e50;
+    -fx-padding: 8;
+}
+
+.table-view .table-row-cell {
+    -fx-border-color: transparent #e9ecef transparent transparent;
+    -fx-border-width: 0 1 0 0;
+}
+
+.table-view .table-row-cell:odd {
+    -fx-background-color: #f8f9fa;
+}
+
+.table-view .table-row-cell:selected {
+    -fx-background-color: #3498db;
+    -fx-text-fill: white;
+}
+
+.table-view .table-cell {
+    -fx-padding: 8;
+    -fx-alignment: CENTER_LEFT;
+}
+
+/* Progress Bar */
+.progress-bar {
+    -fx-background-color: #ecf0f1;
+    -fx-border-color: #bdc3c7;
+    -fx-border-width: 1;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+    -fx-pref-height: 20;
+}
+
+.progress-bar .bar {
+    -fx-background-color: linear-gradient(to right, #3498db, #2980b9);
+    -fx-background-radius: 3;
+    -fx-padding: 2;
+}
+
+/* Slider */
+.slider {
+    -fx-pref-height: 20;
+}
+
+.slider .track {
+    -fx-background-color: #bdc3c7;
+    -fx-background-radius: 2;
+    -fx-pref-height: 4;
+}
+
+.slider .thumb {
+    -fx-background-color: #3498db;
+    -fx-background-radius: 8;
+    -fx-pref-width: 16;
+    -fx-pref-height: 16;
+    -fx-cursor: hand;
+}
+
+.slider .thumb:hover {
+    -fx-background-color: #5dade2;
+}
+
+.slider .thumb:pressed {
+    -fx-background-color: #2980b9;
+}
+
+/* Check Box */
+.check-box {
+    -fx-text-fill: #2c3e50;
+}
+
+.check-box .box {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #bdc3c7;
+    -fx-border-width: 1;
+    -fx-border-radius: 2;
+    -fx-background-radius: 2;
+}
+
+.check-box:selected .box {
+    -fx-background-color: #3498db;
+    -fx-border-color: #3498db;
+}
+
+.check-box:selected .mark {
+    -fx-background-color: #ffffff;
+}
+
+/* Status Labels */
+.status-label {
+    -fx-font-size: 13px;
+    -fx-text-fill: #34495e;
+    -fx-font-style: italic;
+}
+
+/* Status Bar */
+.status-bar {
+    -fx-background-color: linear-gradient(to bottom, #f8f9fa, #e9ecef);
+    -fx-border-color: #d5dbdb;
+    -fx-border-width: 1 0 0 0;
+    -fx-padding: 5 10 5 10;
+}
+
+.status-bar .label {
+    -fx-font-size: 12px;
+    -fx-text-fill: #6c757d;
+}
+
+/* Action Buttons Container */
+.action-buttons {
+    -fx-padding: 10 0 0 0;
+    -fx-spacing: 10;
+}
+
+/* Separator */
+.separator {
+    -fx-background-color: #bdc3c7;
+}
+
+.separator:horizontal .line {
+    -fx-border-color: #bdc3c7 transparent transparent transparent;
+    -fx-border-width: 1 0 0 0;
+}
+
+.separator:vertical .line {
+    -fx-border-color: transparent transparent transparent #bdc3c7;
+    -fx-border-width: 0 0 0 1;
+}
+
+/* Animations and Transitions */
+.control-button, .start-button, .stop-button, .action-button {
+    -fx-transition: all 0.2s ease;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+    .root {
+        -fx-font-size: 12px;
+    }
+    
+    .section-title {
+        -fx-font-size: 14px;
+    }
+}
