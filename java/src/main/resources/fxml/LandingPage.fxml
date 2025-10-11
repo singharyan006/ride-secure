@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Text?>
+<?import javafx.scene.shape.Circle?>
+
+<BorderPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ridesecure.LandingPageController">
+   
+   <!-- Background with gradient -->
+   <center>
+      <StackPane styleClass="landing-background">
+         
+         <!-- Main Content Container -->
+         <VBox alignment="CENTER" spacing="40" styleClass="main-container">
+            
+            <!-- Header Section -->
+            <VBox alignment="CENTER" spacing="15" styleClass="header-section">
+               
+               <!-- Logo/Icon Section -->
+               <HBox alignment="CENTER" spacing="20" styleClass="logo-section">
+                  <Circle radius="35" styleClass="logo-circle" />
+                  <VBox alignment="CENTER_LEFT" spacing="5">
+                     <Text text="RideSecure" styleClass="app-title" />
+                     <Text text="Smart Helmet Detection System" styleClass="app-subtitle" />
+                  </VBox>
+               </HBox>
+               
+               <!-- Mission Statement -->
+               <VBox alignment="CENTER" spacing="10" styleClass="mission-section">
+                  <Text text="Ensuring Road Safety Through AI-Powered Detection" styleClass="mission-title" />
+                  <Text text="Advanced motorcycle helmet compliance monitoring with real-time license plate recognition" styleClass="mission-description" />
+               </VBox>
+               
+            </VBox>
+            
+            <!-- Features Grid -->
+            <HBox alignment="CENTER" spacing="30" styleClass="features-grid">
+               
+               <VBox alignment="CENTER" spacing="10" styleClass="feature-card">
+                  <Circle radius="25" styleClass="feature-icon detection-icon" />
+                  <Text text="AI Detection" styleClass="feature-title" />
+                  <Text text="Real-time helmet detection using advanced machine learning" styleClass="feature-description" />
+               </VBox>
+               
+               <VBox alignment="CENTER" spacing="10" styleClass="feature-card">
+                  <Circle radius="25" styleClass="feature-icon plate-icon" />
+                  <Text text="License Recognition" styleClass="feature-title" />
+                  <Text text="Automatic license plate extraction and verification" styleClass="feature-description" />
+               </VBox>
+               
+               <VBox alignment="CENTER" spacing="10" styleClass="feature-card">
+                  <Circle radius="25" styleClass="feature-icon analytics-icon" />
+                  <Text text="Smart Analytics" styleClass="feature-title" />
+                  <Text text="Comprehensive violation tracking and reporting" styleClass="feature-description" />
+               </VBox>
+               
+            </HBox>
+            
+            <!-- Login Section -->
+            <VBox alignment="CENTER" spacing="20" styleClass="login-section">
+               
+               <!-- Welcome Message -->
+               <Text text="Get Started with RideSecure" styleClass="welcome-title" />
+               
+               <!-- Login/Signup Buttons -->
+               <HBox alignment="CENTER" spacing="20" styleClass="auth-buttons">
+                  <Button fx:id="loginButton" text="Sign In" onAction="#showLoginForm" styleClass="primary-button" />
+                  <Button fx:id="signupButton" text="Create Account" onAction="#showSignupForm" styleClass="secondary-button" />
+               </HBox>
+               
+               <!-- Quick Demo Access -->
+               <VBox alignment="CENTER" spacing="10" styleClass="demo-section">
+                  <Text text="Want to try without signing up?" styleClass="demo-text" />
+                  <Button fx:id="demoButton" text="Try Demo Mode" onAction="#launchDemo" styleClass="demo-button" />
+               </VBox>
+               
+            </VBox>
+            
+         </VBox>
+         
+         <!-- Login/Signup Forms (Initially Hidden) -->
+         <StackPane fx:id="authOverlay" styleClass="auth-overlay" visible="false">
+            
+            <!-- Login Form -->
+            <VBox fx:id="loginForm" alignment="CENTER" spacing="20" styleClass="auth-form" visible="false">
+               <Text text="Welcome Back" styleClass="form-title" />
+               
+               <VBox spacing="15" styleClass="form-fields">
+                  <VBox spacing="5">
+                     <Label text="Email or Username" styleClass="field-label" />
+                     <TextField fx:id="loginUsername" promptText="Enter your email or username" styleClass="auth-field" />
+                  </VBox>
+                  
+                  <VBox spacing="5">
+                     <Label text="Password" styleClass="field-label" />
+                     <PasswordField fx:id="loginPassword" promptText="Enter your password" styleClass="auth-field" />
+                  </VBox>
+               </VBox>
+               
+               <VBox spacing="15" alignment="CENTER">
+                  <Button fx:id="submitLoginButton" text="Sign In" onAction="#handleLogin" styleClass="submit-button" />
+                  <HBox spacing="10" alignment="CENTER">
+                     <Label text="Don't have an account?" styleClass="switch-text" />
+                     <Button text="Sign Up" onAction="#switchToSignup" styleClass="link-button" />
+                  </HBox>
+                  <Button text="Cancel" onAction="#hideAuthForms" styleClass="cancel-button" />
+               </VBox>
+            </VBox>
+            
+            <!-- Signup Form -->
+            <VBox fx:id="signupForm" alignment="CENTER" spacing="20" styleClass="auth-form" visible="false">
+               <Text text="Create Your Account" styleClass="form-title" />
+               
+               <VBox spacing="15" styleClass="form-fields">
+                  <VBox spacing="5">
+                     <Label text="Full Name" styleClass="field-label" />
+                     <TextField fx:id="signupFullName" promptText="Enter your full name" styleClass="auth-field" />
+                  </VBox>
+                  
+                  <VBox spacing="5">
+                     <Label text="Email Address" styleClass="field-label" />
+                     <TextField fx:id="signupEmail" promptText="Enter your email address" styleClass="auth-field" />
+                  </VBox>
+                  
+                  <VBox spacing="5">
+                     <Label text="Username" styleClass="field-label" />
+                     <TextField fx:id="signupUsername" promptText="Choose a username" styleClass="auth-field" />
+                  </VBox>
+                  
+                  <VBox spacing="5">
+                     <Label text="Password" styleClass="field-label" />
+                     <PasswordField fx:id="signupPassword" promptText="Create a strong password" styleClass="auth-field" />
+                  </VBox>
+                  
+                  <VBox spacing="5">
+                     <Label text="Confirm Password" styleClass="field-label" />
+                     <PasswordField fx:id="signupConfirmPassword" promptText="Confirm your password" styleClass="auth-field" />
+                  </VBox>
+               </VBox>
+               
+               <VBox spacing="15" alignment="CENTER">
+                  <Button fx:id="submitSignupButton" text="Create Account" onAction="#handleSignup" styleClass="submit-button" />
+                  <HBox spacing="10" alignment="CENTER">
+                     <Label text="Already have an account?" styleClass="switch-text" />
+                     <Button text="Sign In" onAction="#switchToLogin" styleClass="link-button" />
+                  </HBox>
+                  <Button text="Cancel" onAction="#hideAuthForms" styleClass="cancel-button" />
+               </VBox>
+            </VBox>
+            
+         </StackPane>
+         
+      </StackPane>
+   </center>
+   
+   <!-- Footer -->
+   <bottom>
+      <HBox alignment="CENTER" styleClass="footer">
+         <Text text="© 2025 RideSecure. Ensuring safer roads through intelligent technology." styleClass="footer-text" />
+      </HBox>
+   </bottom>
+   
+</BorderPane>
