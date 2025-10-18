@@ -2,6 +2,7 @@ package com.ridesecure;
 
 import com.ridesecure.model.Violation;
 import com.ridesecure.service.DatabaseService;
+import com.ridesecure.service.DetectionService;
 
 import javafx.application.Platform;
 import javafx.concurrent.Task;
@@ -85,19 +86,22 @@ public class RideSecureFXController implements Initializable {
     private Timeline videoTimeline;
     private Timeline detectionTimeline;
     private DatabaseService databaseService;
+    private DetectionService detectionService;
+    private boolean isDetectionRunning = false;
     
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        initializeDatabase();
+        initializeServices();
         setupTableColumns();
         setupTimeSlider();
         updateStatus("Ready - Load a video to begin");
     }
     
-    private void initializeDatabase() {
+    private void initializeServices() {
         try {
             databaseService = DatabaseService.getInstance();
-            System.out.println("✓ Database service initialized successfully");
+            detectionService = new DetectionService();
+            System.out.println("✓ Services initialized successfully");
             loadExistingViolations();
         } catch (Exception e) {
             System.out.println("⚠ Database service unavailable: " + e.getMessage());
