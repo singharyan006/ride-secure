@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.ridesecure.controllers.MainController"
+            styleClass="main-container">
+    
+    <!-- Top Bar -->
+    <top>
+        <VBox styleClass="top-bar">
+            <padding>
+                <Insets top="20" right="30" bottom="20" left="30"/>
+            </padding>
+            
+            <Label text="🛡️ RideSecure - Detection Dashboard" styleClass="page-title"/>
+            
+            <!-- Controls -->
+            <HBox spacing="15" alignment="CENTER_LEFT">
+                <padding>
+                    <Insets top="15"/>
+                </padding>
+                
+                <Label text="Video:" styleClass="label-text"/>
+                <Label fx:id="videoPathLabel" text="No video selected" styleClass="video-path-label" HBox.hgrow="ALWAYS"/>
+                
+                <Button fx:id="selectVideoButton" text="📁 Select Video" onAction="#handleSelectVideo" styleClass="primary-button"/>
+                <Button fx:id="startDetectionButton" text="▶️ Start Detection" onAction="#handleStartDetection" styleClass="primary-button" disable="true"/>
+                <!-- Save button hidden - Python saves automatically -->
+                <Button fx:id="saveToDBButton" text="💾 Save to Database" onAction="#handleSaveToDB" styleClass="success-button" disable="true" visible="false" managed="false"/>
+            </HBox>
+            
+            <!-- Progress Bar -->
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <padding>
+                    <Insets top="10"/>
+                </padding>
+                
+                <ProgressBar fx:id="progressBar" progress="0" prefWidth="400"/>
+                <Label fx:id="statusLabel" text="Ready" styleClass="status-label"/>
+            </HBox>
+        </VBox>
+    </top>
+    
+    <!-- Center - Violations Table -->
+    <center>
+        <VBox styleClass="table-container">
+            <padding>
+                <Insets top="20" right="30" bottom="20" left="30"/>
+            </padding>
+            
+            <Label text="Detected Violations" styleClass="section-title">
+                <padding>
+                    <Insets bottom="10"/>
+                </padding>
+            </Label>
+            
+            <TableView fx:id="violationsTable" VBox.vgrow="ALWAYS" styleClass="violations-table">
+                <columns>
+                    <TableColumn fx:id="timestampColumn" text="Timestamp" prefWidth="150" styleClass="table-column"/>
+                    <TableColumn fx:id="frameNumberColumn" text="Frame #" prefWidth="80" styleClass="table-column"/>
+                    <TableColumn fx:id="confidenceColumn" text="Confidence" prefWidth="100" styleClass="table-column"/>
+                </columns>
+                
+                <placeholder>
+                    <Label text="No violations detected yet" styleClass="placeholder-text"/>
+                </placeholder>
+            </TableView>
+        </VBox>
+    </center>
+    
+    <!-- Bottom Bar -->
+    <bottom>
+        <HBox alignment="CENTER_RIGHT" styleClass="bottom-bar">
+            <padding>
+                <Insets top="15" right="30" bottom="15" left="30"/>
+            </padding>
+            
+            <Label text="Python API: http://127.0.0.1:8000" styleClass="footer-info"/>
+        </HBox>
+    </bottom>
+    
+</BorderPane>
