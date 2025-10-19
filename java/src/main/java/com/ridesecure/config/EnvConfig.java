@@ -88,8 +88,16 @@ public class EnvConfig {
         if (host == null) {
             throw new RuntimeException("DB_HOST not configured in .env file");
         }
-        
-        return String.format("jdbc:postgresql://%s:%s/%s", host, port, dbName);
+        // Support optional SSL mode (useful for Supabase). Default: enabled.
+        String dbSsl = get("DB_SSL", "true");
+        String base = String.format("jdbc:postgresql://%s:%s/%s", host, port, dbName);
+
+        if ("true".equalsIgnoreCase(dbSsl)) {
+            // Append sslmode=require to ensure TLS when connecting to managed DBs
+            return base + "?sslmode=require";
+        }
+
+        return base;
     }
     
     /**

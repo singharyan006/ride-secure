@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.text.Text?>
+
+<VBox alignment="CENTER" spacing="40" 
+      xmlns="http://javafx.com/javafx" 
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.ridesecure.controllers.LandingController"
+      styleClass="landing-container">
+    
+    <padding>
+        <Insets top="100" right="50" bottom="100" left="50"/>
+    </padding>
+    
+    <!-- Title -->
+    <VBox alignment="CENTER" spacing="15">
+        <Label text="🛡️ RideSecure" styleClass="app-title"/>
+        <Label text="AI-Powered Helmet Violation Detection" styleClass="app-subtitle"/>
+    </VBox>
+    
+    <!-- Description -->
+    <VBox alignment="CENTER" spacing="15" maxWidth="600">
+        <Text text="Advanced machine learning system for detecting helmet violations in traffic surveillance footage." 
+              styleClass="description-text" textAlignment="CENTER" wrappingWidth="550"/>
+        
+        <Text text="Powered by YOLOv8 and DeepSORT tracking" 
+              styleClass="tech-text" textAlignment="CENTER"/>
+    </VBox>
+    
+    <!-- Get Started Button -->
+    <Button text="Get Started" 
+            onAction="#handleGetStarted"
+            styleClass="get-started-button"
+            prefWidth="200"
+            prefHeight="50"/>
+    
+    <!-- Footer -->
+    <Label text="© 2025 RideSecure - Traffic Safety System" 
+           styleClass="footer-text"/>
+    
+</VBox>
