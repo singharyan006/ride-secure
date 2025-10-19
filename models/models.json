@@ -1,0 +1,10 @@
+{
+  "detection": {
+    "custom_helmet": {
+      "path": "E:\\ride-secure\\models\\detection\\custom_helmet"
+    },
+    "yolov8n": {
+      "path": "E:\\ride-secure\\models\\detection\\yolov8n"
+    }
+  }
+}
