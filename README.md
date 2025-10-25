@@ -16,22 +16,22 @@ RideSecure is an intelligent computer vision system that automatically detects m
 ```
 ┌─────────────────────────────────────────────────────┐
 │              JavaFX Desktop Application             │
-│  (Video Upload, Violation Display, Playback)       │
+│  (Video Upload, Violation Display, Playback)        │
 └────────────────┬────────────────────────────────────┘
                  │ HTTP API
                  ▼
 ┌─────────────────────────────────────────────────────┐
 │           Python FastAPI Backend                    │
-│  - YOLOv8 Person Detection                         │
-│  - Custom Helmet Detection                         │
-│  - DeepSORT Multi-Object Tracking                  │
-│  - Video Annotation & Processing                   │
+│  - YOLOv8 Person Detection                          │
+│  - Custom Helmet Detection                          │
+│  - DeepSORT Multi-Object Tracking                   │
+│  - Video Annotation & Processing                    │
 └────────────────┬────────────────────────────────────┘
                  │
                  ▼
 ┌─────────────────────────────────────────────────────┐
 │           Supabase PostgreSQL Database              │
-│  (Violation Records, Track IDs, Timestamps)        │
+│  (Violation Records, Track IDs, Timestamps)         │
 └─────────────────────────────────────────────────────┘
 ```
 
