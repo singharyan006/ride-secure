@@ -1,107 +1,125 @@
 # 🛡️ RideSecure - Intelligent Helmet Detection System
 
-> **A hybrid Java + Python application for automated motorcycle helmet compliance monitoring and license plate recognition**
+> **A hybrid JavaFX desktop + Python ML backend for real-time motorcycle helmet violation detection**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Java](https://img.shields.io/badge/Java-11+-orange.svg)](https://openjdk.java.net/)
-[![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://www.python.org/)
+[![Java](https://img.shields.io/badge/Java-17+-orange.svg)](https://openjdk.java.net/)
+[![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://www.python.org/)
 [![JavaFX](https://img.shields.io/badge/JavaFX-17.0.2-green.svg)](https://openjfx.io/)
 
 ## 🎯 Project Overview
 
-RideSecure is an intelligent computer vision system designed to automatically detect motorcycle riders without helmets from video footage, extract license plate information, and maintain comprehensive violation records. This prototype system combines the robustness of Java for desktop applications with the machine learning capabilities of Python.
+RideSecure is an intelligent computer vision system that automatically detects motorcycle riders without helmets from video footage and maintains comprehensive violation records. The system uses a modern architecture with a JavaFX desktop frontend and a Python FastAPI backend powered by YOLOv8 and DeepSORT tracking.
 
 ### 🏗️ Architecture
 
-```mermaid
-graph TB
-    A[Video Input] --> B[Java Desktop App]
-    B --> C[Frame Extraction]
-    C --> D[Helmet Detection Model]
-    C --> E[License Plate Detection Model]
-    D --> F{Helmet Detected?}
-    F -->|No| E
-    F -->|Yes| G[Skip Frame]
-    E --> H[OCR Processing]
-    H --> I[SQLite Database]
-    I --> J[Violation Report]
-    B --> K[JavaFX GUI]
+```
+┌─────────────────────────────────────────────────────┐
+│              JavaFX Desktop Application             │
+│  (Video Upload, Violation Display, Playback)       │
+└────────────────┬────────────────────────────────────┘
+                 │ HTTP API
+                 ▼
+┌─────────────────────────────────────────────────────┐
+│           Python FastAPI Backend                    │
+│  - YOLOv8 Person Detection                         │
+│  - Custom Helmet Detection                         │
+│  - DeepSORT Multi-Object Tracking                  │
+│  - Video Annotation & Processing                   │
+└────────────────┬────────────────────────────────────┘
+                 │
+                 ▼
+┌─────────────────────────────────────────────────────┐
+│           Supabase PostgreSQL Database              │
+│  (Violation Records, Track IDs, Timestamps)        │
+└─────────────────────────────────────────────────────┘
 ```
 
 ### 🔧 Technology Stack
 
-**Java Components:**
-- **GUI Framework:** JavaFX 17.0.2
-- **Video Processing:** JavaCV (OpenCV bindings)
-- **OCR Engine:** Tess4J (Tesseract wrapper)
-- **Database:** SQLite with JDBC
-- **ML Runtime:** ONNX Runtime for Java
+**Frontend (Java):**
+- **UI Framework:** JavaFX 17.0.2
+- **HTTP Client:** OkHttp3 4.10.0
+- **JSON Processing:** Jackson 2.14.2
+- **Database:** PostgreSQL JDBC Driver
 - **Build Tool:** Maven 3.8+
 
-**Python Components:**
-- **ML Framework:** PyTorch + Ultralytics YOLO v8
-- **Computer Vision:** OpenCV
-- **Model Export:** ONNX for interoperability
-- **API Framework:** FastAPI (optional inference service)
-- **Data Science:** NumPy, Pandas, Matplotlib
+**Backend (Python):**
+- **Web Framework:** FastAPI + Uvicorn
+- **ML Detection:** Ultralytics YOLOv8
+- **Tracking:** DeepSORT
+- **Video Processing:** OpenCV (cv2)
+- **Database ORM:** Supabase Python Client
+- **Package Manager:** uv
 
 ## 📁 Project Structure
 
 ```
 RideSecure/
-├── 📁 java/                          # Java Desktop Application
-│   ├── 📄 pom.xml                   # Maven configuration
-│   ├── 📁 src/
-│   │   ├── 📁 main/java/com/ridesecure/
-│   │   │   ├── 📄 RideSecureApp.java        # Main JavaFX application
-│   │   │   ├── 📄 MainController.java       # Primary UI controller
-│   │   │   ├── 📁 model/                    # Data models
-│   │   │   ├── 📁 service/                  # Business logic
-│   │   │   ├── 📁 detection/               # ML inference wrappers
-│   │   │   ├── 📁 database/                # Database operations
-│   │   │   └── 📁 utils/                   # Utility classes
-│   │   ├── 📁 main/resources/
-│   │   │   ├── 📄 application.fxml         # JavaFX UI layouts
-│   │   │   └── 📁 css/                     # Styling
-│   │   └── 📁 test/java/                   # Java unit tests
-│   └── 📄 README.md                        # Java module docs
-├── 📁 python/                        # Python ML Components  
-│   ├── 📄 pyproject.toml            # Python project config
-│   ├── 📁 src/ridesecure/
-│   │   ├── 📄 __init__.py
-│   │   ├── 📁 training/              # Model training scripts
-│   │   ├── 📁 inference/             # ONNX export & API service
-│   │   ├── 📁 data/                  # Data processing utilities
-│   │   └── 📁 models/                # Model architectures
-│   ├── 📁 notebooks/                 # Jupyter training notebooks
-│   ├── 📁 tests/                     # Python unit tests
-│   └── 📄 README.md                  # Python module docs
-├── 📁 models/                        # Exported ML Models
-│   ├── 📁 onnx/                      # Production ONNX models
-│   │   ├── 📄 helmet_yolo_v8.onnx
-│   │   └── 📄 plate_detection_yolo_v8.onnx
-│   └── 📁 pytorch/                   # PyTorch checkpoints
-├── 📁 data/                          # Training & Test Data
-│   ├── 📁 videos/
-│   │   └── 📁 sample/                # Sample test videos
-│   └── 📁 training/
-│       ├── 📁 helmet_detection/      # Helmet dataset
-│       └── 📁 license_plate/         # License plate dataset
-├── 📁 database/                      # Database Components
+├── 📁 java/                          # JavaFX Desktop Application
+│   ├── 📄 pom.xml                   # Maven dependencies
+│   └── 📁 src/main/
+│       ├── 📁 java/com/ridesecure/
+│       │   ├── 📄 RideSecureApp.java           # Application entry point
+│       │   ├── 📁 controllers/
+│       │   │   ├── 📄 LandingController.java   # Landing page
+│       │   │   └── 📄 MainController.java      # Main detection page
+│       │   ├── 📁 models/
+│       │   │   └── 📄 Violation.java           # Violation data model
+│       │   ├── 📁 services/
+│       │   │   ├── � APIService.java          # Python backend client
+│       │   │   └── � DatabaseService.java     # Database operations
+│       │   └── 📁 config/
+│       │       └── 📄 EnvConfig.java            # Environment variables
+│       └── 📁 resources/
+│           ├── � fxml/                        # UI layouts
+│           │   ├── 📄 Landing.fxml
+│           │   └── 📄 Main.fxml
+│           └── 📁 css/
+│               └── 📄 main.css                 # Stylesheets
+│
+├── 📁 src/                           # Python Backend API
+│   ├── 📄 __init__.py
+│   ├── � api.py                    # FastAPI endpoints
+│   ├── � detector.py               # YOLOv8 detection logic
+│   ├── � tracker.py                # DeepSORT tracking
+│   ├── � video_io.py               # Video processing
+│   ├── � database.py               # Supabase client
+│   ├── � config.py                 # Configuration management
+│   ├── 📄 logger.py                 # Logging setup
+│   ├── � model_registry.py         # Model loading
+│   ├── � utils.py                  # Utility functions
+│   └── 📄 cli.py                    # CLI interface
+│
+├── 📁 models/                        # ML Model Weights
+│   ├── � models.json               # Model configuration
+│   └── 📁 detection/
+│       ├── 📁 yolov8n/              # Person detection
+│       │   └── � weights.pt
+│       └── 📁 custom_helmet/        # Helmet detection
+│           └── � weights.pt
+│
+├── 📁 database/                      # Database Setup
 │   ├── 📁 schema/
 │   │   └── 📄 init.sql              # Database initialization
-│   └── 📄 ridesecure.db            # SQLite database file
-├── 📁 output/                        # Generated Outputs
-│   ├── 📁 snapshots/                # Violation screenshots
-│   ├── 📁 reports/                   # Generated reports
-│   └── 📁 logs/                      # Application logs
-├── 📁 config/                        # Configuration Files
-│   ├── 📄 application.yml           # Main app configuration
-│   └── 📁 tessdata/                 # Tesseract OCR data
+│   └── � migrations/               # Migration scripts
+│
 ├── 📁 docs/                          # Documentation
-├── 📁 .github/workflows/            # CI/CD pipelines
-├── 📄 docker-compose.yml            # Container orchestration
-├── 📄 .gitignore                    # Git ignore rules
+│   └── � API_CLIENT.md             # API documentation
+│
+├── 📁 outputs/                       # Generated Outputs (gitignored)
+│   ├── 📁 annotated_videos/         # Processed videos
+│   └── 📁 csv_logs/                 # Violation logs
+│
+├── � .env.example                  # Environment variables template
+├── 📄 .python-version               # Python version (3.11)
+├── 📄 requirements.txt              # Python dependencies
+├── � pyproject.toml                # Python project config (uv)
+├── � uv.lock                       # Dependency lock file
+├── � test_backend.py               # Backend API tests
+├── 📄 test_model_detection.py       # Model inference tests
+├── 📄 QUICK_START.md                # Quick start guide
+├── 📄 CONTRIBUTING.md               # Contribution guidelines
 └── 📄 README.md                     # This file
 ```
 
@@ -109,11 +127,11 @@ RideSecure/
 
 ### Prerequisites
 
-- **Java 11+** (OpenJDK recommended)
-- **Python 3.8+** with pip
-- **Maven 3.6+**
-- **Git** for version control
-- **CUDA** (optional, for GPU acceleration)
+- **Java 17+** (OpenJDK recommended)
+- **Python 3.11+** with pip or uv
+- **Maven 3.8+**
+- **PostgreSQL** (Supabase account)
+- **Git**
 
 ### 1. Clone Repository
 
@@ -122,67 +140,99 @@ git clone https://github.com/singharyan006/ride-secure.git
 cd ride-secure
 ```
 
-### 2. Setup Python Environment
+### 2. Setup Environment Variables
 
 ```bash
-cd python
-pip install -e .
-# For development
-pip install -e .[dev]
-# For GPU support
-pip install -e .[gpu]
+# Copy and configure environment file
+cp .env.example .env
+
+# Edit .env with your credentials:
+# - SUPABASE_URL
+# - SUPABASE_KEY
+# - DATABASE_URL (PostgreSQL connection string)
 ```
 
-### 3. Setup Java Application
+### 3. Initialize Database
 
 ```bash
-cd ../java
+# Run the initialization script on your Supabase database
+# Execute the SQL in database/schema/init.sql
+```
+
+### 4. Setup Python Backend
+
+```bash
+# Using uv (recommended)
+uv sync
+
+# Or using pip
+pip install -r requirements.txt
+
+# Start the FastAPI server
+uvicorn src.api:app --reload --host 127.0.0.1 --port 8000
+```
+
+### 5. Run JavaFX Desktop App
+
+```bash
+cd java
 mvn clean compile
 mvn javafx:run
 ```
 
-### 4. Initialize Database
+### 6. Process Videos
 
-```bash
-cd ../database
-sqlite3 ridesecure.db < schema/init.sql
-```
+1. Click "Start Detection" on the landing page
+2. Select a video file (MP4, AVI, MOV, MKV)
+3. Backend processes the video with helmet detection
+4. View violations in the table
+5. Double-click to play annotated video in system player
 
-### 5. Download Sample Data
-
-```bash
-# Download sample videos to data/videos/sample/
-# Download pre-trained models to models/onnx/
-```
+For detailed instructions, see [QUICK_START.md](QUICK_START.md).
 
 ## 🔄 Workflow
 
-### Prototype Stage Process
-
-1. **Video Loading**: JavaFX application loads test videos from `data/videos/`
-2. **Frame Processing**: Each frame is analyzed for helmet violations
-3. **Helmet Detection**: YOLO model identifies riders and helmet status
-4. **Violation Detection**: Frames with no-helmet riders trigger license plate detection
-5. **License Plate Recognition**: 
-   - YOLO detects license plate regions
-   - Tesseract OCR extracts plate numbers
-6. **Database Logging**: Violations stored in SQLite with timestamps and snapshots
-7. **GUI Display**: Real-time visualization with bounding boxes and violation table
-
 ### Detection Pipeline
 
+1. **Video Upload**: User selects video through JavaFX interface
+2. **API Request**: Java app sends video to Python backend via HTTP
+3. **Frame Processing**: Backend processes each frame:
+   - YOLOv8n detects persons in frame
+   - Custom model detects helmets on detected persons
+   - DeepSORT tracks each person across frames with unique track_id
+4. **Violation Detection**: If helmet not detected for 30+ consecutive frames
+5. **Database Logging**: Violations stored in Supabase with:
+   - Track ID, frame number, timestamp
+   - Detection confidence scores
+   - Video filename and session info
+6. **Video Annotation**: Annotated video created with:
+   - RED bounding boxes = No helmet detected
+   - GREEN bounding boxes = Helmet present
+7. **Playback**: Annotated video opens in system default player (VLC/Windows Media Player)
+
+### Detection Logic
+
 ```python
-# Simplified detection flow
-for frame in video_frames:
-    riders = helmet_detection_model.detect(frame)
+# Real-time helmet status tracking
+track_helmet_status = {}  # {track_id: helmet_present}
+
+for frame_idx, frame in enumerate(video):
+    persons = detect_persons(frame)  # YOLOv8n
     
-    for rider in riders:
-        if not rider.has_helmet and rider.confidence > threshold:
-            plate_region = license_plate_model.detect(frame, rider.bbox)
-            
-            if plate_region:
-                plate_text = tesseract_ocr.extract_text(plate_region)
-                save_violation(frame, rider, plate_text, timestamp)
+    for person in persons:
+        track_id = tracker.update(person)
+        helmet_present = detect_helmet(person.bbox)
+        
+        # Update real-time status
+        track_helmet_status[track_id] = helmet_present
+        
+        # Log violation every 30 frames if no helmet
+        if not helmet_present and frame_idx % 30 == 0:
+            log_violation(track_id, frame_idx)
+        
+        # Annotate based on real-time status
+        color = GREEN if helmet_present else RED
+        draw_bbox(frame, person.bbox, color)
 ```
 
 ## 🏃‍♂️ Running the Application
@@ -190,11 +240,11 @@ for frame in video_frames:
 ### Development Mode
 
 ```bash
-# Start Python inference service (optional)
-cd python
-python -m uvicorn src.ridesecure.inference.api:app --reload --host 0.0.0.0 --port 8000
+# Terminal 1: Start Python backend
+cd ride-secure
+uvicorn src.api:app --reload --host 127.0.0.1 --port 8000
 
-# Run Java desktop application
+# Terminal 2: Run JavaFX app
 cd java
 mvn javafx:run
 ```
@@ -202,135 +252,34 @@ mvn javafx:run
 ### Production Mode
 
 ```bash
-# Using Docker Compose
-docker-compose up -d
-
-# Or build standalone JAR
+# Build standalone JAR
 cd java
 mvn clean package
-java -jar target/ridesecure-desktop-1.0.0-SNAPSHOT.jar
+
+# Run the application
+java -jar target/ridesecure-1.0-SNAPSHOT.jar
 ```
 
-## 🧪 Model Training
+### API Endpoints
 
-### Helmet Detection
+The Python backend exposes:
+- `POST /process-video/` - Upload and process video
+- `GET /health` - Health check
+- `GET /violations/` - Query violations
 
-```bash
-cd python/notebooks
-jupyter notebook helmet_detection_training.ipynb
-
-# Or via command line
-cd python
-python -m ridesecure.training.train_helmet_model \
-    --data data/training/helmet_detection \
-    --epochs 100 \
-    --batch-size 16
-```
-
-### License Plate Detection
-
-```bash
-python -m ridesecure.training.train_plate_model \
-    --data data/training/license_plate \
-    --epochs 50 \
-    --batch-size 8
-```
-
-### Model Export
-
-```bash
-# Export trained models to ONNX format
-python -m ridesecure.inference.export_models \
-    --input models/pytorch/helmet_best.pt \
-    --output models/onnx/helmet_yolo_v8.onnx
-```
-
-## 🏗️ Architecture Details
-
-### Java Application Architecture
-
-```
-com.ridesecure/
-├── RideSecureApp           # JavaFX Application entry point
-├── controller/
-│   ├── MainController      # Primary UI controller
-│   └── SettingsController  # Configuration UI
-├── model/
-│   ├── Violation          # Violation data model
-│   ├── DetectionResult    # Detection result wrapper
-│   └── VideoFrame         # Frame processing model
-├── service/
-│   ├── VideoProcessor     # Video loading and frame extraction
-│   ├── DetectionService   # ML model inference coordination
-│   ├── DatabaseService    # SQLite operations
-│   └── ReportGenerator    # Export and reporting
-├── detection/
-│   ├── HelmetDetector     # ONNX helmet detection wrapper
-│   ├── PlateDetector      # ONNX plate detection wrapper
-│   └── OCRProcessor       # Tesseract integration
-└── utils/
-    ├── ConfigManager      # Configuration loading
-    ├── ImageUtils         # Image processing utilities
-    └── FileUtils          # File operations
-```
-
-### Python ML Architecture
-
-```
-ridesecure/
-├── training/
-│   ├── helmet_trainer.py    # YOLO helmet detection training
-│   ├── plate_trainer.py     # YOLO license plate training
-│   └── data_augmentation.py # Data preprocessing
-├── inference/
-│   ├── onnx_exporter.py    # PyTorch to ONNX conversion
-│   ├── api.py              # FastAPI inference service
-│   └── batch_processor.py  # Batch video processing
-├── models/
-│   ├── yolo_helmet.py      # Custom YOLO architecture
-│   └── yolo_plate.py       # Plate detection model
-└── data/
-    ├── dataset_loader.py   # Training data pipeline
-    └── video_processor.py  # Video frame extraction
-```
-
-## 📊 Database Schema
-
-### Core Tables
-
-- **violations**: Main violation records with detection metadata
-- **detection_sessions**: Video processing session tracking
-- **model_performance**: ML model accuracy metrics
-
-### Key Features
-
-- Automatic timestamp tracking
-- Indexed searching by license plate and timestamp
-- Session-based processing for batch operations
-- Model performance monitoring
-
-## ⚙️ Configuration
-
-### Application Settings (`config/application.yml`)
-
-```yaml
-# Key configuration options
-models:
-  helmet_detection:
-    confidence_threshold: 0.7    # Adjust based on model accuracy
-    
-detection:
-  helmet_violation_threshold: 0.8  # Certainty level for violations
-  min_detection_duration_frames: 5 # Avoid false positives
-```
-
-### Model Configuration
-
-- **Confidence Thresholds**: Adjust based on model performance vs false positives
-- **NMS Thresholds**: Fine-tune for overlapping detections
-- **Input Sizes**: Match training resolution for optimal accuracy
+See [docs/API_CLIENT.md](docs/API_CLIENT.md) for detailed API documentation.
 
 ## 🧪 Testing
+
+### Python Backend Tests
+
+```bash
+# Test API endpoints
+python test_backend.py
+
+# Test model detection
+python test_model_detection.py
+```
 
 ### Java Unit Tests
 
@@ -339,164 +288,166 @@ cd java
 mvn test
 ```
 
-### Python Tests
+### Manual Integration Test
+
+1. Start Python backend: `uvicorn src.api:app --reload`
+2. Run Java app: `cd java && mvn javafx:run`
+3. Upload test video through UI
+4. Verify violations appear in table
+5. Check annotated video plays correctly
+
+## � Configuration
+
+### Environment Variables (`.env`)
 
 ```bash
-cd python
-pytest tests/ -v --cov=ridesecure
+# Supabase Database
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_KEY=your-anon-key
+
+# PostgreSQL Connection
+DATABASE_URL=postgresql://user:password@host:port/database
+
+# Python Backend
+API_PORT=8000
+API_HOST=127.0.0.1
 ```
 
-### Integration Testing
+### Model Configuration (`models/models.json`)
 
-```bash
-# End-to-end test with sample video
-python python/tests/test_integration.py
+```json
+{
+  "person_detection": {
+    "model_path": "models/detection/yolov8n/weights.pt",
+    "confidence": 0.5
+  },
+  "helmet_detection": {
+    "model_path": "models/detection/custom_helmet/weights.pt",
+    "confidence": 0.6
+  }
+}
 ```
 
-## 📈 Performance Optimization
+### Detection Thresholds
+
+Adjust in `src/config.py`:
+- `PERSON_CONFIDENCE_THRESHOLD = 0.5` - Person detection sensitivity
+- `HELMET_CONFIDENCE_THRESHOLD = 0.6` - Helmet detection sensitivity
+- `VIOLATION_LOG_INTERVAL = 30` - Frames between violation logs
+
+## � Performance Considerations
 
 ### Hardware Recommendations
 
 - **CPU**: Intel i5-8400 / AMD Ryzen 5 2600 or better
-- **RAM**: 8GB minimum, 16GB recommended
-- **GPU**: NVIDIA GTX 1060 or better (for GPU acceleration)
-- **Storage**: SSD recommended for video processing
+- **RAM**: 8GB minimum, 16GB recommended for HD videos
+- **GPU**: Optional (NVIDIA CUDA support for faster inference)
+- **Storage**: SSD recommended for video I/O
 
 ### Optimization Tips
 
-1. **Batch Processing**: Process multiple frames together for efficiency
-2. **Frame Skipping**: Skip frames during low-motion periods
-3. **Model Quantization**: Use INT8 ONNX models for faster inference
-4. **Caching**: Cache detection results for replay scenarios
-
-## 🚀 Deployment Options
-
-### Desktop Deployment
-
-```bash
-# Create executable JAR
-cd java
-mvn clean package
-# Distribute target/ridesecure-desktop-1.0.0-SNAPSHOT.jar
-```
-
-### Docker Deployment
-
-```bash
-# Multi-service deployment
-docker-compose up -d
-```
-
-### Cloud Deployment
-
-- **AWS**: EC2 with GPU instances for inference service
-- **Google Cloud**: Compute Engine with TPU support
-- **Azure**: VM with GPU for real-time processing
-
-## 🔧 Development Guidelines
-
-### Code Style
-
-- **Java**: Follow Google Java Style Guide
-- **Python**: Follow PEP 8, enforced with Black formatter
-- **Commits**: Use Conventional Commits format
-
-### Contributing
-
-We welcome contributions from the community! Please read our [Contributing Guidelines](CONTRIBUTING.md) for detailed information on:
-
-- **Development Setup**: Environment configuration for Java + Python
-- **Coding Standards**: Style guides and best practices
-- **Testing Requirements**: Unit, integration, and coverage guidelines  
-- **Pull Request Process**: Step-by-step contribution workflow
-- **Issue Guidelines**: Bug reports and feature requests
-
-**Quick Start for Contributors:**
-1. Fork the repository and clone locally
-2. Read [CONTRIBUTING.md](CONTRIBUTING.md) for detailed setup
-3. Create feature branch (`git checkout -b feature/amazing-feature`)
-4. Follow coding standards and add tests
-5. Run quality checks (`mvn test` and `pytest --cov`)
-6. Submit Pull Request with proper description
+- Process videos at 15-30 FPS for real-time performance
+- Use smaller input resolution for faster processing
+- Adjust confidence thresholds to balance accuracy vs speed
+- GPU acceleration can provide 3-5x speedup
 
 ## 📋 Roadmap
 
-### Phase 1: Prototype (Current)
-- [x] Basic helmet detection with YOLO
-- [x] License plate OCR with Tesseract
-- [x] SQLite violation logging
-- [x] JavaFX desktop interface
+### ✅ Phase 1: Core System (Completed)
+- [x] YOLOv8 person and helmet detection
+- [x] DeepSORT multi-object tracking
+- [x] FastAPI backend with video processing
+- [x] JavaFX desktop frontend
+- [x] Supabase PostgreSQL integration
+- [x] Annotated video output with color-coded boxes
 
-### Phase 2: Enhancement
-- [ ] Real-time camera integration
-- [ ] Advanced OCR with deep learning
-- [ ] Multi-camera support
-- [ ] Web-based dashboard
+### 🚧 Phase 2: Enhancement (In Progress)
+- [ ] Real-time camera/RTSP stream support
+- [ ] License plate detection and OCR
+- [ ] Advanced analytics dashboard
+- [ ] Batch video processing queue
+- [ ] Export reports (PDF, CSV, Excel)
 
-### Phase 3: Production
+### 🔮 Phase 3: Production (Planned)
+- [ ] Web-based admin dashboard
+- [ ] Mobile application (Android/iOS)
+- [ ] Cloud deployment support
 - [ ] Edge device deployment
-- [ ] Cloud integration
-- [ ] Advanced analytics
-- [ ] Mobile application
+- [ ] Advanced violation classification
 
 ## 🛠️ Troubleshooting
 
 ### Common Issues
 
-**JavaFX Module Path Issues**
+**Python Backend Not Starting**
 ```bash
-# Add to JVM args:
---module-path /path/to/javafx/lib --add-modules javafx.controls,javafx.fxml
+# Check if port 8000 is available
+netstat -ano | findstr :8000
+
+# Install dependencies
+pip install -r requirements.txt
 ```
 
-**Python CUDA Issues**
+**JavaFX Module Errors**
 ```bash
-# Verify CUDA installation:
-python -c "import torch; print(torch.cuda.is_available())"
+# Ensure JAVA_HOME is set to Java 17+
+java --version
+
+# Clean and rebuild
+cd java
+mvn clean install
 ```
 
-**SQLite Permissions**
-```bash
-# Fix database permissions:
-chmod 664 database/ridesecure.db
-```
+**Database Connection Errors**
+- Verify `.env` file has correct Supabase credentials
+- Check database schema is initialized (`database/schema/init.sql`)
+- Test connection: `psql $DATABASE_URL`
 
-**Model Loading Errors**
-- Ensure ONNX models are in `models/onnx/` directory
-- Verify model file integrity with ONNX tools
-- Check configuration paths in `config/application.yml`
+**Video Not Playing**
+- Annotated videos open in system default player
+- Ensure VLC or Windows Media Player is installed
+- Check `outputs/annotated_videos/` for generated files
+
+**Detection Not Working**
+- Verify model weights exist in `models/detection/*/weights.pt`
+- Check Python backend logs for errors
+- Test models: `python test_model_detection.py`
 
 ## 🤝 Contributing
 
-We encourage contributions from developers, researchers, and domain experts! See our [Contributing Guidelines](CONTRIBUTING.md) for:
+We encourage contributions! Please read [CONTRIBUTING.md](CONTRIBUTING.md) for:
 
-- Development environment setup
-- Coding standards and best practices
-- Testing requirements and guidelines
-- Pull request and review process
-- Community guidelines and support
+- **Development Setup**: Environment configuration
+- **Coding Standards**: Java and Python style guides
+- **Testing Requirements**: Unit and integration tests
+- **Pull Request Process**: Contribution workflow
+- **Issue Guidelines**: Bug reports and feature requests
 
-For first-time contributors, look for issues labeled `good first issue` in our [GitHub Issues](https://github.com/singharyan006/ride-secure/issues).
+**Quick Start for Contributors:**
+1. Fork the repository
+2. Create feature branch: `git checkout -b feature/your-feature`
+3. Follow coding standards and add tests
+4. Commit with conventional commits: `feat:`, `fix:`, `docs:`, etc.
+5. Push and submit Pull Request
 
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-By contributing to this project, you agree that your contributions will be licensed under the same MIT License.
-
 ## 🤝 Acknowledgments
 
-- **Ultralytics YOLO** for object detection framework
+- **Ultralytics YOLOv8** for state-of-the-art object detection
+- **DeepSORT** for robust multi-object tracking
 - **OpenCV** for computer vision utilities
-- **Tesseract OCR** for text recognition
-- **JavaFX** for desktop UI framework
-- **FastAPI** for efficient Python web services
+- **FastAPI** for high-performance Python web framework
+- **JavaFX** for modern desktop UI
+- **Supabase** for managed PostgreSQL database
 
-## 📞 Support
+## 📞 Contact & Support
 
 - **Issues**: [GitHub Issues](https://github.com/singharyan006/ride-secure/issues)
 - **Discussions**: [GitHub Discussions](https://github.com/singharyan006/ride-secure/discussions)
-- **Email**: ridesecure.support@example.com
+- **Email**: support@ridesecure.com
 
 ---
 
