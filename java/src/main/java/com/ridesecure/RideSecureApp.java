@@ -23,7 +23,7 @@ public class RideSecureApp extends Application {
         Parent root = FXMLLoader.load(getClass().getResource("/fxml/Landing.fxml"));
         
         Scene scene = new Scene(root, 1200, 800);
-        scene.getStylesheets().add(getClass().getResource("/css/landing.css").toExternalForm());
+        scene.getStylesheets().add(getClass().getResource("/css/main.css").toExternalForm());
         
         stage.setTitle("RideSecure - Helmet Violation Detection");
         stage.setScene(scene);
